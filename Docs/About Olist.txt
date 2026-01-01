@@ -1,0 +1,7 @@
+#TLDR
+Olist in an business to business to Consumer type business (B2B2C)
+
+#About Olist
+Olist is just a big department store that have various items (like Matahari Mall clothing store). the product is provided by seller that have agreement with olist. Olist is a 3rd party that provide brand image and easiness.
+
+The interesting about olist is that, seller does not have to handle various setup with other marketplace, this is done by olist with a lot of partner.
