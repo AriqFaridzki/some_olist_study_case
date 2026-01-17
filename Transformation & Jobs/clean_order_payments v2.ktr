@@ -1,6 +1,6 @@
 <transformation>
   <info>
-    <name>clean_customers - Copy</name>
+    <name>clean_order_payments v2</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -428,7 +428,7 @@
     <created_user>-</created_user>
     <created_date>2026/01/01 15:28:46.218</created_date>
     <modified_user>-</modified_user>
-    <modified_date>2026/01/01 18:47:08.492</modified_date>
+    <modified_date>2026/01/17 11:43:09.293</modified_date>
     <key_for_session_key>H4sIAAAAAAAA/wMAAAAAAAAAAAA=</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
@@ -491,13 +491,65 @@
   </connection>
   <order>
     <hop>
-      <from>Table input</from>
-      <to>Calculator</to>
+      <from>order_payment table</from>
+      <to>Select values</to>
       <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>Table input</name>
+    <name>group payment for smthng</name>
+    <type>GroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <all_rows>Y</all_rows>
+    <ignore_aggregate>N</ignore_aggregate>
+    <field_ignore/>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>grp</prefix>
+    <add_linenr>N</add_linenr>
+    <linenr_fieldname/>
+    <give_back_row>N</give_back_row>
+    <group>
+      <field>
+        <name>order_id</name>
+      </field>
+    </group>
+    <fields>
+      <field>
+        <aggregate>total_payment_value</aggregate>
+        <subject>payment_value</subject>
+        <type>SUM</type>
+        <valuefield/>
+      </field>
+      <field>
+        <aggregate>count_payment_method</aggregate>
+        <subject>payment_type</subject>
+        <type>COUNT_DISTINCT</type>
+        <valuefield/>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>384</xloc>
+      <yloc>384</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>order_payment table</name>
     <type>TableInput</type>
     <description/>
     <distribute>Y</distribute>
@@ -510,14 +562,12 @@
     <connection>OLIST_DB</connection>
     <sql>SELECT
   order_id
-, order_item_id
-, product_id
-, seller_id
-, shipping_limit_date
-, price
-, freight_value
-FROM oltp.olist_order_items_dataset
-</sql>
+, payment_sequential
+, payment_type
+, payment_installments
+, payment_value
+FROM oltp.olist_order_payments_dataset
+ORDER BY order_id ASC;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -576,11 +626,11 @@ FROM oltp.olist_order_items_dataset
       <value-meta>
         <type>Integer</type>
         <storagetype>normal</storagetype>
-        <name>order_item_id</name>
+        <name>payment_sequential</name>
         <length>9</length>
         <precision>0</precision>
         <origin>Table input</origin>
-        <comments>order_item_id</comments>
+        <comments>payment_sequential</comments>
         <conversion_Mask>####0;-####0</conversion_Mask>
         <decimal_symbol>.</decimal_symbol>
         <grouping_symbol>,</grouping_symbol>
@@ -603,11 +653,11 @@ FROM oltp.olist_order_items_dataset
           <value-meta>
             <type>String</type>
             <storagetype>normal</storagetype>
-            <name>product_id</name>
-            <length>32</length>
+            <name>payment_type</name>
+            <length>20</length>
             <precision>-1</precision>
             <origin>Table input</origin>
-            <comments>product_id</comments>
+            <comments>payment_type</comments>
             <conversion_Mask/>
             <decimal_symbol>.</decimal_symbol>
             <grouping_symbol>,</grouping_symbol>
@@ -624,11 +674,11 @@ FROM oltp.olist_order_items_dataset
             <lenient_string_to_number>N</lenient_string_to_number>
           </value-meta>
         </storage-meta>
-        <name>product_id</name>
-        <length>32</length>
+        <name>payment_type</name>
+        <length>20</length>
         <precision>-1</precision>
         <origin>Table input</origin>
-        <comments>product_id</comments>
+        <comments>payment_type</comments>
         <conversion_Mask/>
         <decimal_symbol>.</decimal_symbol>
         <grouping_symbol>,</grouping_symbol>
@@ -645,62 +695,14 @@ FROM oltp.olist_order_items_dataset
         <lenient_string_to_number>N</lenient_string_to_number>
       </value-meta>
       <value-meta>
-        <type>String</type>
-        <storagetype>binary-string</storagetype>
-        <storage-meta>
-          <value-meta>
-            <type>String</type>
-            <storagetype>normal</storagetype>
-            <name>seller_id</name>
-            <length>32</length>
-            <precision>-1</precision>
-            <origin>Table input</origin>
-            <comments>seller_id</comments>
-            <conversion_Mask/>
-            <decimal_symbol>.</decimal_symbol>
-            <grouping_symbol>,</grouping_symbol>
-            <currency_symbol/>
-            <trim_type>none</trim_type>
-            <case_insensitive>N</case_insensitive>
-            <collator_disabled>Y</collator_disabled>
-            <collator_strength>0</collator_strength>
-            <sort_descending>N</sort_descending>
-            <output_padding>N</output_padding>
-            <date_format_lenient>N</date_format_lenient>
-            <date_format_locale>en_ID</date_format_locale>
-            <date_format_timezone>Asia/Jakarta</date_format_timezone>
-            <lenient_string_to_number>N</lenient_string_to_number>
-          </value-meta>
-        </storage-meta>
-        <name>seller_id</name>
-        <length>32</length>
-        <precision>-1</precision>
-        <origin>Table input</origin>
-        <comments>seller_id</comments>
-        <conversion_Mask/>
-        <decimal_symbol>.</decimal_symbol>
-        <grouping_symbol>,</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>en_ID</date_format_locale>
-        <date_format_timezone>Asia/Jakarta</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>Timestamp</type>
+        <type>Integer</type>
         <storagetype>normal</storagetype>
-        <name>shipping_limit_date</name>
-        <length>6</length>
-        <precision>-1</precision>
+        <name>payment_installments</name>
+        <length>9</length>
+        <precision>0</precision>
         <origin>Table input</origin>
-        <comments>shipping_limit_date</comments>
-        <conversion_Mask/>
+        <comments>payment_installments</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
         <decimal_symbol>.</decimal_symbol>
         <grouping_symbol>,</grouping_symbol>
         <currency_symbol/>
@@ -718,34 +720,11 @@ FROM oltp.olist_order_items_dataset
       <value-meta>
         <type>Number</type>
         <storagetype>normal</storagetype>
-        <name>price</name>
+        <name>payment_value</name>
         <length>10</length>
         <precision>2</precision>
         <origin>Table input</origin>
-        <comments>price</comments>
-        <conversion_Mask>####0.0#########;-####0.0#########</conversion_Mask>
-        <decimal_symbol>.</decimal_symbol>
-        <grouping_symbol>,</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>en_ID</date_format_locale>
-        <date_format_timezone>Asia/Jakarta</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>Number</type>
-        <storagetype>normal</storagetype>
-        <name>freight_value</name>
-        <length>10</length>
-        <precision>2</precision>
-        <origin>Table input</origin>
-        <comments>freight_value</comments>
+        <comments>payment_value</comments>
         <conversion_Mask>####0.0#########;-####0.0#########</conversion_Mask>
         <decimal_symbol>.</decimal_symbol>
         <grouping_symbol>,</grouping_symbol>
@@ -772,13 +751,13 @@ FROM oltp.olist_order_items_dataset
     </remotesteps>
     <GUI>
       <xloc>112</xloc>
-      <yloc>240</yloc>
+      <yloc>224</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Calculator</name>
-    <type>Calculator</type>
+    <name>Select values</name>
+    <type>SelectValues</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -787,52 +766,97 @@ FROM oltp.olist_order_items_dataset
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <failIfNoFile>Y</failIfNoFile>
-    <calculation>
-      <field_name>order_item_shipping_limit_in_date</field_name>
-      <calc_type>REMOVE_TIME_FROM_DATE</calc_type>
-      <field_a>shipping_limit_date</field_a>
-      <field_b/>
-      <field_c/>
-      <value_type>Date</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask>yyyy/MM/dd</conversion_mask>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>order_item_shipping_limit_in_hour</field_name>
-      <calc_type>HOUR_OF_DAY</calc_type>
-      <field_a>shipping_limit_date</field_a>
-      <field_b/>
-      <field_c/>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>order_item_shipping_limit_in_day</field_name>
-      <calc_type>DAY_OF_MONTH</calc_type>
-      <field_a>shipping_limit_date</field_a>
-      <field_b/>
-      <field_c/>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
+    <fields>
+      <field>
+        <name>order_id</name>
+        <rename/>
+      </field>
+      <field>
+        <name>payment_sequential</name>
+        <rename/>
+      </field>
+      <field>
+        <name>payment_type</name>
+        <rename/>
+      </field>
+      <field>
+        <name>payment_installments</name>
+        <rename/>
+      </field>
+      <field>
+        <name>payment_value</name>
+        <rename/>
+      </field>
+      <select_unspecified>N</select_unspecified>
+      <meta>
+        <name>payment_sequential</name>
+        <rename>payment_sequential</rename>
+        <type>None</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>
+      <meta>
+        <name>payment_type</name>
+        <rename>payment_type</rename>
+        <type>None</type>
+        <length>20</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>
+      <meta>
+        <name>payment_installments</name>
+        <rename>payment_installments</rename>
+        <type>None</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>
+      <meta>
+        <name>payment_value</name>
+        <rename>payment_value</rename>
+        <type>None</type>
+        <length>10</length>
+        <precision>2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>
+    </fields>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -842,8 +866,8 @@ FROM oltp.olist_order_items_dataset
       </output>
     </remotesteps>
     <GUI>
-      <xloc>320</xloc>
-      <yloc>224</yloc>
+      <xloc>416</xloc>
+      <yloc>208</yloc>
       <draw>Y</draw>
     </GUI>
   </step>

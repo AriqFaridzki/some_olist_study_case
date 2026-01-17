@@ -1,6 +1,6 @@
 <transformation>
   <info>
-    <name>clean_customers</name>
+    <name>clean_order_items v2</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -428,8 +428,8 @@
     <created_user>-</created_user>
     <created_date>2026/01/01 15:28:46.218</created_date>
     <modified_user>-</modified_user>
-    <modified_date>2026/01/01 16:08:05.672</modified_date>
-    <key_for_session_key/>
+    <modified_date>2026/01/17 11:18:56.903</modified_date>
+    <key_for_session_key>H4sIAAAAAAAA/wMAAAAAAAAAAAA=</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
@@ -460,6 +460,10 @@
         <attribute>N</attribute>
       </attribute>
       <attribute>
+        <code>MSSQL_DOUBLE_DECIMAL_SEPARATOR</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
         <code>PORT_NUMBER</code>
         <attribute>5433</attribute>
       </attribute>
@@ -487,23 +491,86 @@
   </connection>
   <order>
     <hop>
-      <from>Table input</from>
-      <to>String operations</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>String operations</from>
-      <to>Replace in string</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Replace in string</from>
-      <to>Select values</to>
+      <from>order_items table</from>
+      <to>rearrange column</to>
       <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>Table input</name>
+    <name>rearrange column</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>order_id</name>
+        <rename/>
+      </field>
+      <field>
+        <name>order_item_id</name>
+        <rename/>
+      </field>
+      <field>
+        <name>product_id</name>
+        <rename/>
+      </field>
+      <field>
+        <name>seller_id</name>
+        <rename/>
+      </field>
+      <field>
+        <name>shipping_limit_date</name>
+        <rename/>
+      </field>
+      <field>
+        <name>price</name>
+        <rename>order_item_price</rename>
+      </field>
+      <field>
+        <name>freight_value</name>
+        <rename>order_item_freight_value</rename>
+      </field>
+      <select_unspecified>N</select_unspecified>
+      <meta>
+        <name>shipping_limit_date</name>
+        <rename>order_item_shipping_limit_date</rename>
+        <type>Date</type>
+        <length>6</length>
+        <precision>-2</precision>
+        <conversion_mask>yyyy-MM-dd HH:mm:ss</conversion_mask>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>512</xloc>
+      <yloc>208</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>order_items table</name>
     <type>TableInput</type>
     <description/>
     <distribute>Y</distribute>
@@ -515,12 +582,14 @@
     </partitioning>
     <connection>OLIST_DB</connection>
     <sql>SELECT
-  customer_id
-, customer_unique_id
-, customer_zip_code_prefix
-, customer_city
-, customer_state
-FROM oltp.olist_customers_dataset
+  order_id
+, order_item_id
+, product_id
+, seller_id
+, shipping_limit_date
+, price
+, freight_value
+FROM oltp.olist_order_items_dataset
 </sql>
     <limit>0</limit>
     <lookup/>
@@ -536,11 +605,11 @@ FROM oltp.olist_customers_dataset
           <value-meta>
             <type>String</type>
             <storagetype>normal</storagetype>
-            <name>customer_id</name>
+            <name>order_id</name>
             <length>32</length>
             <precision>-1</precision>
             <origin>Table input</origin>
-            <comments>customer_id</comments>
+            <comments>order_id</comments>
             <conversion_Mask/>
             <decimal_symbol>.</decimal_symbol>
             <grouping_symbol>,</grouping_symbol>
@@ -557,59 +626,11 @@ FROM oltp.olist_customers_dataset
             <lenient_string_to_number>N</lenient_string_to_number>
           </value-meta>
         </storage-meta>
-        <name>customer_id</name>
+        <name>order_id</name>
         <length>32</length>
         <precision>-1</precision>
         <origin>Table input</origin>
-        <comments>customer_id</comments>
-        <conversion_Mask/>
-        <decimal_symbol>.</decimal_symbol>
-        <grouping_symbol>,</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>en_ID</date_format_locale>
-        <date_format_timezone>Asia/Jakarta</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>String</type>
-        <storagetype>binary-string</storagetype>
-        <storage-meta>
-          <value-meta>
-            <type>String</type>
-            <storagetype>normal</storagetype>
-            <name>customer_unique_id</name>
-            <length>32</length>
-            <precision>-1</precision>
-            <origin>Table input</origin>
-            <comments>customer_unique_id</comments>
-            <conversion_Mask/>
-            <decimal_symbol>.</decimal_symbol>
-            <grouping_symbol>,</grouping_symbol>
-            <currency_symbol/>
-            <trim_type>none</trim_type>
-            <case_insensitive>N</case_insensitive>
-            <collator_disabled>Y</collator_disabled>
-            <collator_strength>0</collator_strength>
-            <sort_descending>N</sort_descending>
-            <output_padding>N</output_padding>
-            <date_format_lenient>N</date_format_lenient>
-            <date_format_locale>en_ID</date_format_locale>
-            <date_format_timezone>Asia/Jakarta</date_format_timezone>
-            <lenient_string_to_number>N</lenient_string_to_number>
-          </value-meta>
-        </storage-meta>
-        <name>customer_unique_id</name>
-        <length>32</length>
-        <precision>-1</precision>
-        <origin>Table input</origin>
-        <comments>customer_unique_id</comments>
+        <comments>order_id</comments>
         <conversion_Mask/>
         <decimal_symbol>.</decimal_symbol>
         <grouping_symbol>,</grouping_symbol>
@@ -628,11 +649,11 @@ FROM oltp.olist_customers_dataset
       <value-meta>
         <type>Integer</type>
         <storagetype>normal</storagetype>
-        <name>customer_zip_code_prefix</name>
+        <name>order_item_id</name>
         <length>9</length>
         <precision>0</precision>
         <origin>Table input</origin>
-        <comments>customer_zip_code_prefix</comments>
+        <comments>order_item_id</comments>
         <conversion_Mask>####0;-####0</conversion_Mask>
         <decimal_symbol>.</decimal_symbol>
         <grouping_symbol>,</grouping_symbol>
@@ -655,11 +676,11 @@ FROM oltp.olist_customers_dataset
           <value-meta>
             <type>String</type>
             <storagetype>normal</storagetype>
-            <name>customer_city</name>
-            <length>50</length>
+            <name>product_id</name>
+            <length>32</length>
             <precision>-1</precision>
             <origin>Table input</origin>
-            <comments>customer_city</comments>
+            <comments>product_id</comments>
             <conversion_Mask/>
             <decimal_symbol>.</decimal_symbol>
             <grouping_symbol>,</grouping_symbol>
@@ -676,11 +697,11 @@ FROM oltp.olist_customers_dataset
             <lenient_string_to_number>N</lenient_string_to_number>
           </value-meta>
         </storage-meta>
-        <name>customer_city</name>
-        <length>50</length>
+        <name>product_id</name>
+        <length>32</length>
         <precision>-1</precision>
         <origin>Table input</origin>
-        <comments>customer_city</comments>
+        <comments>product_id</comments>
         <conversion_Mask/>
         <decimal_symbol>.</decimal_symbol>
         <grouping_symbol>,</grouping_symbol>
@@ -703,11 +724,11 @@ FROM oltp.olist_customers_dataset
           <value-meta>
             <type>String</type>
             <storagetype>normal</storagetype>
-            <name>customer_state</name>
-            <length>2</length>
+            <name>seller_id</name>
+            <length>32</length>
             <precision>-1</precision>
             <origin>Table input</origin>
-            <comments>customer_state</comments>
+            <comments>seller_id</comments>
             <conversion_Mask/>
             <decimal_symbol>.</decimal_symbol>
             <grouping_symbol>,</grouping_symbol>
@@ -724,12 +745,81 @@ FROM oltp.olist_customers_dataset
             <lenient_string_to_number>N</lenient_string_to_number>
           </value-meta>
         </storage-meta>
-        <name>customer_state</name>
-        <length>2</length>
+        <name>seller_id</name>
+        <length>32</length>
         <precision>-1</precision>
         <origin>Table input</origin>
-        <comments>customer_state</comments>
+        <comments>seller_id</comments>
         <conversion_Mask/>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol>,</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>en_ID</date_format_locale>
+        <date_format_timezone>Asia/Jakarta</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Timestamp</type>
+        <storagetype>normal</storagetype>
+        <name>shipping_limit_date</name>
+        <length>6</length>
+        <precision>-1</precision>
+        <origin>Table input</origin>
+        <comments>shipping_limit_date</comments>
+        <conversion_Mask/>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol>,</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>en_ID</date_format_locale>
+        <date_format_timezone>Asia/Jakarta</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Number</type>
+        <storagetype>normal</storagetype>
+        <name>price</name>
+        <length>10</length>
+        <precision>2</precision>
+        <origin>Table input</origin>
+        <comments>price</comments>
+        <conversion_Mask>####0.0#########;-####0.0#########</conversion_Mask>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol>,</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>en_ID</date_format_locale>
+        <date_format_timezone>Asia/Jakarta</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Number</type>
+        <storagetype>normal</storagetype>
+        <name>freight_value</name>
+        <length>10</length>
+        <precision>2</precision>
+        <origin>Table input</origin>
+        <comments>freight_value</comments>
+        <conversion_Mask>####0.0#########;-####0.0#########</conversion_Mask>
         <decimal_symbol>.</decimal_symbol>
         <grouping_symbol>,</grouping_symbol>
         <currency_symbol/>
@@ -754,220 +844,8 @@ FROM oltp.olist_customers_dataset
       </output>
     </remotesteps>
     <GUI>
-      <xloc>112</xloc>
-      <yloc>256</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Replace in string</name>
-    <type>ReplaceString</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-      <field>
-        <in_stream_name>customer_city</in_stream_name>
-        <out_stream_name/>
-        <use_regex>yes</use_regex>
-        <replace_string>\s+</replace_string>
-        <replace_by_string>_</replace_by_string>
-        <set_empty_string>N</set_empty_string>
-        <replace_field_by_string/>
-        <whole_word>no</whole_word>
-        <case_sensitive>no</case_sensitive>
-        <is_unicode>no</is_unicode>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>416</xloc>
-      <yloc>192</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>String operations</name>
-    <type>StringOperations</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-      <field>
-        <in_stream_name>customer_city</in_stream_name>
-        <out_stream_name/>
-        <trim_type>both</trim_type>
-        <lower_upper>lower</lower_upper>
-        <padding_type>none</padding_type>
-        <pad_char/>
-        <pad_len/>
-        <init_cap>N</init_cap>
-        <mask_xml>None</mask_xml>
-        <digits>none</digits>
-        <remove_special_characters>none</remove_special_characters>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>240</xloc>
-      <yloc>192</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Select values</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-      <field>
-        <name>customer_id</name>
-        <rename/>
-      </field>
-      <field>
-        <name>customer_unique_id</name>
-        <rename/>
-      </field>
-      <field>
-        <name>customer_zip_code_prefix</name>
-        <rename/>
-      </field>
-      <field>
-        <name>customer_city</name>
-        <rename/>
-      </field>
-      <field>
-        <name>customer_state</name>
-        <rename/>
-      </field>
-      <select_unspecified>N</select_unspecified>
-      <meta>
-        <name>customer_id</name>
-        <rename>customer_id</rename>
-        <type>String</type>
-        <length>32</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>
-      <meta>
-        <name>customer_unique_id</name>
-        <rename>customer_unique_id</rename>
-        <type>String</type>
-        <length>32</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>
-      <meta>
-        <name>customer_zip_code_prefix</name>
-        <rename>customer_zip_code_prefix</rename>
-        <type>String</type>
-        <length>9</length>
-        <precision>0</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>
-      <meta>
-        <name>customer_city</name>
-        <rename>customer_city</rename>
-        <type>String</type>
-        <length>50</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>
-      <meta>
-        <name>customer_state</name>
-        <rename>customer_state</rename>
-        <type>String</type>
-        <length>2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>608</xloc>
-      <yloc>192</yloc>
+      <xloc>224</xloc>
+      <yloc>208</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
